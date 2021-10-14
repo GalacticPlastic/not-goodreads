@@ -39,7 +39,9 @@ RSpec.describe '/api/authors' do
       end
 
       it 'creates an author' do
-        expect { post api_authors_path, params: params }.to change { Author.count }.by(1)
+        expect do
+          post api_authors_path, params: params
+        end.to change(Author, :count).by(1)
       end
 
       it 'returns the created author' do
