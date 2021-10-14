@@ -47,7 +47,6 @@ RSpec.describe '/api/reviews' do
       it 'returns the created review' do
         post api_reviews_path, params: params
 
-        puts response_hash
         expect(response_hash).to include(params)
         expect(response.status).to eq(200)
       end

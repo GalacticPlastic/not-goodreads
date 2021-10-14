@@ -3,6 +3,7 @@
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :book
+  after_create :update_average_book_rating
 
   validates :rating,
             inclusion: {
@@ -19,4 +20,13 @@ class Review < ApplicationRecord
   scope :has_description, -> { where.not(description: nil) }
   scope :sort_by_highest_rating, -> { order(rating: :desc) }
   scope :sort_by_lowest_rating, -> { order(rating: :asc) }
+
+  private
+
+  def update_average_book_rating
+    book = Book.find_by!(id: Review.last.book_id)
+    new_average = Review.where(book_id: book.id).average(:rating)
+
+    book.update!(rating: new_average)
+  end
 end
