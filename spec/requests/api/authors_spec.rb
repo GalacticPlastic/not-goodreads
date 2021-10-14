@@ -1,48 +1,19 @@
+# frozen_string_literal: true
+
+require 'support/shared_examples/requests'
+
 RSpec.describe '/api/authors' do
   let(:response_hash) { JSON(response.body, symbolize_names: true) }
 
-  describe 'GET to /' do
-    it 'returns all authors' do
-      author = create(:author)
-
-      get api_authors_path
-
-      expect(response_hash).to eq(
-        [
-          {
-            created_at: author.created_at.iso8601(3),
-            description: author.description,
-            first_name: author.first_name,
-            last_name: author.last_name,
-            genres: author.genres,
-            id: author.id,
-            updated_at: author.updated_at.iso8601(3),
-            website: author.website
-          }
-        ]
-      )
-    end
-  end
+  include_examples 'requests', 'author'
 
   describe 'GET to /:id' do
     context 'when found' do
       it 'returns an author' do
-        author = create(:author)
+        new_author = create(:author)
+        get api_author_path(new_author)
 
-        get api_author_path(author)
-
-        expect(response_hash).to eq(
-          {
-            created_at: author.created_at.iso8601(3),
-            description: author.description,
-            first_name: author.first_name,
-            last_name: author.last_name,
-            genres: author.genres,
-            id: author.id,
-            updated_at: author.updated_at.iso8601(3),
-            website: author.website
-          }
-        )
+        expect(response).to serialize_object(new_author).with(AuthorSerializer)
       end
     end
 
@@ -68,13 +39,14 @@ RSpec.describe '/api/authors' do
       end
 
       it 'creates an author' do
-        expect { post api_authors_path, params: params }.to change { Author.count }
+        expect { post api_authors_path, params: params }.to change { Author.count }.by(1)
       end
 
       it 'returns the created author' do
         post api_authors_path, params: params
 
         expect(response_hash).to include(params)
+        expect(response.status).to eq(200)
       end
     end
 

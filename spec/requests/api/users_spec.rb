@@ -1,42 +1,19 @@
+# frozen_string_literal: true
+
+require 'support/shared_examples/requests'
+
 RSpec.describe '/api/users' do
   let(:response_hash) { JSON(response.body, symbolize_names: true) }
 
-  describe 'GET to /' do
-    it 'returns all users' do
-      user = create(:user)
-
-      get api_users_path
-
-      expect(response_hash).to eq(
-        [
-          {
-            created_at: user.created_at.iso8601(3),
-            first_name: user.first_name,
-            last_name: user.last_name,
-            id: user.id,
-            updated_at: user.updated_at.iso8601(3)
-          }
-        ]
-      )
-    end
-  end
+  include_examples 'requests', 'user'
 
   describe 'GET to /:id' do
     context 'when found' do
       it 'returns an user' do
         user = create(:user)
-
         get api_user_path(user)
 
-        expect(response_hash).to eq(
-          {
-            created_at: user.created_at.iso8601(3),
-            first_name: user.first_name,
-            last_name: user.last_name,
-            id: user.id,
-            updated_at: user.updated_at.iso8601(3)
-          }
-        )
+        expect(response).to serialize_object(user).with(UserSerializer)
       end
     end
 
@@ -59,12 +36,11 @@ RSpec.describe '/api/users' do
       end
 
       it 'creates an user' do
-        expect { post api_users_path, params: params }.to change { User.count }
+        expect { post api_users_path, params: params }.to change { User.count }.by(1)
       end
 
       it 'returns the created user' do
         post api_users_path, params: params
-
         expect(response_hash).to include(params)
       end
     end

@@ -1,48 +1,19 @@
+# frozen_string_literal: true
+
+require 'support/shared_examples/requests'
+
 RSpec.describe '/api/books' do
   let(:response_hash) { JSON(response.body, symbolize_names: true) }
 
-  describe 'GET to /' do
-    it 'returns all books' do
-      book = create(:book)
-
-      get api_books_path
-
-      expect(response_hash).to eq(
-        [
-          {
-            author_id: book.author_id,
-            created_at: book.created_at.iso8601(3),
-            description: book.description,
-            id: book.id,
-            publish_date: book.publish_date,
-            rating: book.rating,
-            title: book.title,
-            updated_at: book.updated_at.iso8601(3)
-          }
-        ]
-      )
-    end
-  end
+  include_examples 'requests', 'book'
 
   describe 'GET to /:id' do
     context 'when found' do
       it 'returns an book' do
         book = create(:book)
-
         get api_book_path(book)
 
-        expect(response_hash).to eq(
-          {
-            author_id: book.author_id,
-            created_at: book.created_at.iso8601(3),
-            description: book.description,
-            id: book.id,
-            publish_date: book.publish_date,
-            rating: book.rating,
-            title: book.title,
-            updated_at: book.updated_at.iso8601(3)
-          }
-        )
+        expect(response).to serialize_object(book).with(BookSerializer)
       end
     end
 
@@ -60,20 +31,21 @@ RSpec.describe '/api/books' do
       let(:author) { create(:author) }
       let(:params) do
         {
-          description: 'It was the best of times',
           title: 'War and Peace',
+          description: 'It was the best of times',
           author_id: author.id
         }
       end
 
       it 'creates a book' do
-        expect { post api_books_path, params: params }.to change { Book.count }
+        expect { post api_books_path, params: params }.to change { Book.count }.by(1)
       end
 
       it 'returns the created book' do
         post api_books_path, params: params
 
         expect(response_hash).to include(params)
+        expect(response.status).to eq(200)
       end
     end
 
