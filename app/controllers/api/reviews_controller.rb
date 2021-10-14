@@ -24,12 +24,20 @@ module API
       end
     end
 
-    def update; end
+    def update
+      review = Review.find(params[:id])
+
+      if review.update(allowed_params)
+        render json: review
+      else
+        render json: { errors: review.errors.full_messages }
+      end
+    end
 
     private
 
     def allowed_params
-      params.permit(:user_id, :book_id, :rating, :description)
+      params.permit(:rating, :description, :user_id, :book_id)
     end
   end
 end

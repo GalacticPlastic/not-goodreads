@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 class ReviewSerializer < ActiveModel::Serializer
-  attributes :id, :rating, :description
+  attributes :rating, :description, :user_id, :book_id
 
-  has_one :book
-  has_one :user
+  attribute :user_id do
+    object.user.id
+  end
+
+  attribute :book_id do
+    object.book.id
+  end
 end
