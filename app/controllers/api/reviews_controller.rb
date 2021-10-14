@@ -2,6 +2,18 @@
 
 module API
   class ReviewsController < ApplicationController
+    def index
+      @reviews = Review.all
+      @reviews = Review.sort_by_lowest_rating if params[:sort_rating] == 'ASC'
+      @reviews = Review.sort_by_highest_rating if params[:sort_rating] == 'DESC'
+      @reviews = Review.has_description if params[:sort_description] == 'true'
+      render json: @reviews
+    end
+
+    def show
+      render json: Review.find(params[:id])
+    end
+
     def create
       review = Review.new(allowed_params)
 
@@ -10,14 +22,6 @@ module API
       else
         render json: { errors: review.errors.full_messages }
       end
-    end
-
-    def index
-      render json: Review.all
-    end
-
-    def show
-      render json: Review.find(params[:id])
     end
 
     def update; end

@@ -15,4 +15,8 @@ class Review < ApplicationRecord
               scope: %i[user_id book_id],
               message: 'limited to one review per book.'
             }
+
+  scope :has_description, -> { where.not(description: nil) }
+  scope :sort_by_highest_rating, -> { order(rating: :desc) }
+  scope :sort_by_lowest_rating, -> { order(rating: :asc) }
 end
