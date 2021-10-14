@@ -1,5 +1,5 @@
 class AddUniqueIndexConstraintToReviews < ActiveRecord::Migration[6.1]
   def change
-    add_index :reviews, [:book_id, :user_id], unique: true
+    add_index :reviews, %i[book_id user_id], unique: true
   end
 end
