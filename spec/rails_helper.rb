@@ -3,6 +3,29 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
+
+require 'simplecov'
+require 'simplecov-console'
+
+module SimpleCov::Formatter
+  class MergedFormatter
+    def format(result)
+      SimpleCov::Formatter::HTMLFormatter.new.format(result)
+      SimpleCov::Formatter::Console.new.format(result)
+    end
+  end
+end
+
+SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+
+SimpleCov.start do
+  # Excluded directories
+  %w[bin config coverage db node_modules public spec tmp vendor].each { |dir| add_filter dir }
+  %w[assets channels javascript mailers].each { |path| add_filter "app/#{path}/" }
+  add_filter 'app/models/ability.rb'
+  add_filter 'lib/migrations'
+end
+
 require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
