@@ -17,6 +17,8 @@ class Review < ApplicationRecord
               message: 'limited to one review per book.'
             }
 
+  validate :what_the_frak
+
   scope :has_description, -> { where.not(description: nil) }
   scope :sort_by_highest_rating, -> { order(rating: :desc) }
   scope :sort_by_lowest_rating, -> { order(rating: :asc) }
@@ -28,5 +30,13 @@ class Review < ApplicationRecord
     new_average = Review.where(book_id: book.id).average(:rating)
 
     book.update!(rating: new_average)
+  end
+
+  def what_the_frak
+    submission = description.split
+    profanity = %w[frak storms gorram nerfherder crivens]
+
+    # TODO: Regex fanciness
+    errors.add(:description, 'profanity not allowed!') unless (submission & profanity).empty?
   end
 end
