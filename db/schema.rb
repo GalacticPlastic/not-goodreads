@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_12_032407) do
+ActiveRecord::Schema.define(version: 2021_10_14_061031) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2021_10_12_032407) do
     t.string "last_name"
     t.string "website"
     t.string "genres", default: [], array: true
-    t.text "description"
+    t.text "description", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 2021_10_12_032407) do
     t.text "description", null: false
     t.date "publish_date"
     t.decimal "rating"
-    t.bigint "author_id"
+    t.bigint "author_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["author_id"], name: "index_books_on_author_id"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 2021_10_12_032407) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "user_id", null: false
     t.bigint "book_id", null: false
+    t.index ["book_id", "user_id"], name: "index_reviews_on_book_id_and_user_id", unique: true
     t.index ["book_id"], name: "index_reviews_on_book_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
@@ -55,4 +56,6 @@ ActiveRecord::Schema.define(version: 2021_10_12_032407) do
   end
 
   add_foreign_key "books", "authors"
+  add_foreign_key "reviews", "books"
+  add_foreign_key "reviews", "users"
 end

@@ -2,7 +2,15 @@
 
 module API
   class ReviewsController < ApplicationController
-    def create; end
+    def create
+      review = Review.new(allowed_params)
+
+      if review.save
+        render json: review
+      else
+        render json: { errors: review.errors.full_messages }
+      end
+    end
 
     def index
       render json: Review.all
@@ -17,7 +25,7 @@ module API
     private
 
     def allowed_params
-      params.permit
+      params.permit(:user_id, :book_id, :rating, :description)
     end
   end
 end
